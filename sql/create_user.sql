@@ -5,3 +5,5 @@ CREATE USER ccactive_user IDENTIFIED BY &ccactive_user_password;--set password
 GRANT CONNECT, RESOURCE TO ccactive_user;
 GRANT CREATE VIEW TO ccactive_user;
 GRANT CREATE PROCEDURE TO ccactive_user;
+GRANT CREATE SEQUENCE TO ccactive_user;
+GRANT CREATE TRIGGER TO ccactive_user;
