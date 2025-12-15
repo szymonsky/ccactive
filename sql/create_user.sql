@@ -7,3 +7,5 @@ GRANT CREATE VIEW TO ccactive_user;
 GRANT CREATE PROCEDURE TO ccactive_user;
 GRANT CREATE SEQUENCE TO ccactive_user;
 GRANT CREATE TRIGGER TO ccactive_user;
+-- pozwól userowi tworzyć i zapisywać dane w domyślnym tablespace USERS
+ALTER USER ccactive_user QUOTA UNLIMITED ON USERS;
