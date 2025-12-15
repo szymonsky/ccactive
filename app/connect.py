@@ -1,9 +1,14 @@
 import oracledb
+import os
+from dotenv import load_dotenv
+
+# wczytaj dane z pliku .env
+load_dotenv()
 
 # dane logowania
-username = "ccactive_user"
-password = "ccactive"  # <-- USTAWIĆ HASŁO - NIE UJAWNIAĆ!
-dsn = "localhost/XEPDB1"
+username = os.getenv("DB_USER")
+password = os.getenv("DB_PASSWORD")
+dsn = os.getenv("DB_DSN")
 
 # połączenie
 connection = oracledb.connect(user=username, password=password, dsn=dsn)
