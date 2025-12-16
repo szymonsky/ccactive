@@ -14,4 +14,4 @@ FROM status_logs sl
 JOIN users u ON sl.user_id = u.user_id
 JOIN statuses s ON sl.status_id = s.status_id
 GROUP BY u.username, s.status_name, TRUNC(sl.timestamp_start)
-ORDER BY u.username, day, s.status_name;
+ORDER BY u.username, day, s.status_name
