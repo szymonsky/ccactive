@@ -1,3 +1,6 @@
+# to testowe połączenie z bazą danych z jawnie wpisanymi danymi logowania
+# używać tylko lokalnie lub przy szybkim testowaniu połączenia
+
 import oracledb
 import os
 from dotenv import load_dotenv
