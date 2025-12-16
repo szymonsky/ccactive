@@ -1,19 +1,16 @@
-# testowa wersja zmiany statusu agenta bez zamykania poprzedniego wpisu
-# służy do wstawiania prostych danych testowych do tabeli status_logs
+# testowa wersja zmiany statusu agenta z zamknięciem poprzedniego wpisu w status_logs
+# używać tylko do testowania ręcznego lub debugowania
 
-import oracledb
 import os
-from dotenv import load_dotenv
+import sys
 from datetime import datetime
 
-# wczytaj dane z pliku .env
-load_dotenv()
+# dodanie ścieżki do katalogu głównego, aby import z app.* działał poprawnie
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-username = os.getenv("DB_USER")
-password = os.getenv("DB_PASSWORD")
-dsn = os.getenv("DB_DSN")
+from app.db_connection import get_connection
 
-connection = oracledb.connect(user=username, password=password, dsn=dsn)
+connection = get_connection()
 
 with connection.cursor() as cursor:
     # pobierz użytkowników

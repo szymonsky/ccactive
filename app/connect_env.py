@@ -1,21 +1,19 @@
-#  skrypt pozwala ręcznie zmienić status agenta, dodając nowy wpis do status_logs
-import oracledb
+# testowy skrypt do ręcznego ustawiania statusu agenta – wykorzystuje get_connection() z app.db_connection
+
 import os
-from dotenv import load_dotenv
+import sys
 from datetime import datetime
 
-# wczytaj dane z pliku .env
-load_dotenv()
+# dodanie ścieżki do katalogu głównego
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-username = os.getenv("DB_USER")
-password = os.getenv("DB_PASSWORD")
-dsn = os.getenv("DB_DSN")
+from app.db_connection import get_connection
 
 # połączenie z bazą danych
-connection = oracledb.connect(user=username, password=password, dsn=dsn)
+connection = get_connection()
 
 with connection.cursor() as cursor:
-    # pobierz dostępnych użytkowników
+    # pobierz użytkowników
     cursor.execute("SELECT user_id, username FROM users")
     users = cursor.fetchall()
 
@@ -25,7 +23,7 @@ with connection.cursor() as cursor:
 
     user_id = int(input("\npodaj ID użytkownika: "))
 
-    # pobierz dostępne statusy
+    # pobierz statusy
     cursor.execute("SELECT status_id, status_name FROM statuses")
     statuses = cursor.fetchall()
 
@@ -35,7 +33,7 @@ with connection.cursor() as cursor:
 
     status_id = int(input("\npodaj ID statusu: "))
 
-    # wstaw nowy wpis do status_logs
+    # dodaj nowy wpis do status_logs
     cursor.execute("""
         INSERT INTO status_logs (user_id, status_id, timestamp_start)
         VALUES (:1, :2, :3)

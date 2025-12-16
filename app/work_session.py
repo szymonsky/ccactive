@@ -1,19 +1,16 @@
 # loguje lub wylogowuje użytkownika i zapisuje sesję w tabeli work_sessions
 # dodatkowo zapisuje aktualnie zalogowanego użytkownika do pliku current_user.txt,
 # który służy do identyfikacji aktywnej sesji w innych skryptach
-import oracledb
+
 import os
-from dotenv import load_dotenv
+import sys
 
-# wczytaj dane z pliku .env
-load_dotenv()
+# dodanie ścieżki do katalogu app
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-username = os.getenv("DB_USER")
-password = os.getenv("DB_PASSWORD")
-dsn = os.getenv("DB_DSN")
+from app.db_connection import get_connection
 
-# połączenie z bazą danych
-connection = oracledb.connect(user=username, password=password, dsn=dsn)
+connection = get_connection()
 
 with connection.cursor() as cursor:
     # pobierz listę użytkowników

@@ -1,16 +1,13 @@
 # generuje testowe wpisy statusów do tabeli status_logs dla wybranych użytkowników
-import oracledb
 import os
 import random
 from datetime import datetime, timedelta
-from dotenv import load_dotenv
+import sys
 
-# wczytaj dane z pliku .env --plik .env nie jest w katalogu glownym
-load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), '..', 'app', '.env'))
+# dodanie ścieżki do katalogu głównego, aby import z app.* działał poprawnie
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-username = os.getenv("DB_USER")
-password = os.getenv("DB_PASSWORD")
-dsn = os.getenv("DB_DSN")
+from app.db_connection import get_connection
 
 # konfiguracja generatora
 DAYS_BACK = 3  # liczba dni wstecz do generowania logów
@@ -18,7 +15,7 @@ ENTRIES_PER_USER = 5  # ile wpisów statusów na użytkownika
 STATUS_IDS = [1, 2, 3, 4]  # id statusów: Dostępny, Rozmowa, Przerwa, Offline
 
 # połączenie z bazą danych
-connection = oracledb.connect(user=username, password=password, dsn=dsn)
+connection = get_connection()
 
 with connection.cursor() as cursor:
     # pobierz użytkowników

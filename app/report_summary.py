@@ -1,24 +1,21 @@
 # łączy się z bazą i wyświetla raport czasu pracy agentów w podziale na dni i statusy
-import oracledb
 import os
-from dotenv import load_dotenv
+import sys
 
-# wczytaj dane z pliku .env
-load_dotenv()
+# dodanie ścieżki do katalogu głównego projektu
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-username = os.getenv("DB_USER")
-password = os.getenv("DB_PASSWORD")
-dsn = os.getenv("DB_DSN")
+from app.db_connection import get_connection
 
 # ścieżka do pliku sql z zapytaniem
-sql_file_path = "../sql/select_status_time_report.sql"
+sql_file_path = os.path.join("sql", "select_status_time_report.sql")
 
 # wczytaj zapytanie z pliku
 with open(sql_file_path, "r", encoding="utf-8") as file:
     query = file.read()
 
 # połączenie z bazą danych
-connection = oracledb.connect(user=username, password=password, dsn=dsn)
+connection = get_connection()
 
 with connection.cursor() as cursor:
     cursor.execute(query)
