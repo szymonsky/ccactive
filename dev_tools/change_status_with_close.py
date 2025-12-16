@@ -1,5 +1,6 @@
-# testowa wersja zmiany statusu agenta z zamknięciem poprzedniego wpisu w status_logs
-# używać tylko do testowania ręcznego lub debugowania
+# dev-only: prototyp logiki zmiany statusu
+# zastąpiony przez app/status_service.py
+
 
 import os
 import sys
