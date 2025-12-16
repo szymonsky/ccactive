@@ -1,4 +1,5 @@
 # skrypt zmienia status agenta i zamyka poprzedni, ustawiając timestamp_end
+#testowy skrypt, który służy tylko do ręcznego sprawdzenia, czy zmiana statusów działa poprawnie.
 
 import oracledb
 import os
