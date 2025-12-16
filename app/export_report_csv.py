@@ -30,7 +30,7 @@ with connection.cursor() as cursor:
     cursor.execute(query)
     rows = cursor.fetchall()
 
-    with open(filename, "w", newline="", encoding="utf-8") as csvfile:
+    with open(filename, "w", newline="", encoding="utf-8-sig") as csvfile:
         writer = csv.writer(csvfile)
         writer.writerow(["Użytkownik", "Status", "Dzień", "Minuty"])
         writer.writerows(rows)
