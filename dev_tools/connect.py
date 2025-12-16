@@ -1,5 +1,5 @@
-# to testowe połączenie z bazą danych z jawnie wpisanymi danymi logowania
-# używać tylko lokalnie lub przy szybkim testowaniu połączenia
+# dev-only: szybki test połączenia z bazą i odczyt widoku view_current_status
+# nie jest częścią aplikacji CCActive (nie importować w app/, nie uruchamiać z main.py!!!)
 
 
 import sys
