@@ -15,6 +15,8 @@ def change_status(
     # 1. zamyka poprzedni aktywny status
     # 2. dodaje nowy wpis do status_logs
 
+    now = datetime.now()
+
     connection = get_connection()
     cursor = connection.cursor()
 
@@ -25,7 +27,7 @@ def change_status(
         WHERE user_id = :user_id
           AND timestamp_end IS NULL
     """, {
-        "now": datetime.now(),
+        "now": now,
         "user_id": user_id
     })
 
@@ -48,7 +50,7 @@ def change_status(
     """, {
         "user_id": user_id,
         "status_id": status_id,
-        "now": datetime.now(),
+        "now": now,
         "source": source,
         "external_call_id": external_call_id
     })
