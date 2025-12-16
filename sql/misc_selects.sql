@@ -4,6 +4,7 @@ select * from users order by 1 desc;
 select * from roles order by 1 desc;
 select * from VIEW_CURRENT_STATUS order by 1 desc;
 select * from work_sessions order by 1 desc;
+SELECT * FROM status_logs ORDER BY user_id, timestamp_start;
 
 SELECT 
     log_id,
