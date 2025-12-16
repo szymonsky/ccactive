@@ -1,15 +1,16 @@
-# ten skrypt stanowi główny interfejs aplikacji tekstowej CCActive – pozwala na wybór akcji
+#  główny interfejs aplikacji tekstowej CCActive – pozwala na wybór akcji
 import os
 import report_summary
 import work_session
 
-# wersja rozwojowa – podstawowe menu tekstowe
+# placeholdery – rozwojowe
 
 def main_menu():
     while True:
         print("\n--- CCActive – menu główne ---")
         print("1. zaloguj / wyloguj użytkownika")
         print("2. pokaż raport czasu pracy")
+        print("3. zmień status użytkownika")
         print("0. wyjście")
 
         choice = input("\nWybierz opcję: ")
@@ -18,6 +19,8 @@ def main_menu():
             os.system("python work_session.py")
         elif choice == "2":
             os.system("python report_summary.py")
+        elif choice == "3":
+            os.system("python change_status.py")
         elif choice == "0":
             print("Zamykam aplikację.")
             break
