@@ -1,3 +1,4 @@
+# dev-only: generator losowych wpisów statusów do bazy
 # generuje testowe wpisy statusów do tabeli status_logs dla wybranych użytkowników
 import os
 import random

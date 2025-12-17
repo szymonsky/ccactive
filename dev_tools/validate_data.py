@@ -1,3 +1,4 @@
+# dev-only: walidacja spójności danych testowych
 #  sprawdza poprawność danych w tabelach status_logs i work_sessions na podstawie 3 reguł
 
 import os

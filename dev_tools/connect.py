@@ -1,6 +1,5 @@
 # dev-only: szybki test połączenia z bazą i odczyt widoku view_current_status
-# nie jest częścią aplikacji CCActive (nie importować w app/, nie uruchamiać z main.py!!!)
-
+# nie jest częścią aplikacji CCActive - służy do szybkiego sprawdzenia poprawności połączenia z bazą danych
 
 import sys
 import os
