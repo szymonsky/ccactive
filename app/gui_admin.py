@@ -45,3 +45,118 @@ class GUIAdmin(tk.Tk):
         self.tree.column("role", width=100)
         self.tree.column("status", width=160)
         self.tree.column("since", width=180)
+
+        self.tree.pack(fill=tk.X, padx=10)
+
+        # --- dashboard ---
+        ttk.Label(
+            self,
+            text="Statusy bieżące (liczba agentów)",
+            font=("Segoe UI", 10, "bold")
+        ).pack(pady=(15, 5))
+
+        self.dashboard_frame = ttk.Frame(self)
+        self.dashboard_frame.pack(pady=5)
+
+        self.dashboard_labels = {}
+
+        # --- przyciski ---
+        buttons_frame = ttk.Frame(self)
+        buttons_frame.pack(pady=15)
+
+        ttk.Button(
+            buttons_frame,
+            text="Odśwież dane",
+            command=self.refresh_all
+        ).grid(row=0, column=0, padx=10)
+
+        ttk.Button(
+            buttons_frame,
+            text="Eksportuj raport CSV",
+            command=self.export_csv
+        ).grid(row=0, column=1, padx=10)
+
+    def load_data(self):
+        # wyczyść tabelę
+        for row in self.tree.get_children():
+            self.tree.delete(row)
+
+        connection = get_connection()
+        cursor = connection.cursor()
+
+        cursor.execute("""
+            SELECT
+                username,
+                role_name,
+                status_name,
+                timestamp_start
+            FROM view_current_status
+            ORDER BY username
+        """)
+
+        rows = cursor.fetchall()
+
+        for row in rows:
+            self.tree.insert("", tk.END, values=row)
+
+        cursor.close()
+        connection.close()
+
+    def load_dashboard(self):
+        # dashboard admina: zliczenie liczby agentów w poszczególnych statusach (stan bieżący)
+
+        # usuń stare etykiety
+        for widget in self.dashboard_frame.winfo_children():
+            widget.destroy()
+
+        connection = get_connection()
+        cursor = connection.cursor()
+
+        cursor.execute("""
+            SELECT
+                status_name,
+                COUNT(*) AS agent_count
+            FROM view_current_status
+            GROUP BY status_name
+            ORDER BY status_name
+        """)
+
+        rows = cursor.fetchall()
+
+        col = 0
+        for status_name, count in rows:
+            label = ttk.Label(
+                self.dashboard_frame,
+                text=f"{status_name}: {count}",
+                font=("Segoe UI", 10)
+            )
+            label.grid(row=0, column=col, padx=15)
+            col += 1
+
+        cursor.close()
+        connection.close()
+
+    def refresh_all(self):
+        self.load_data()
+        self.load_dashboard()
+
+    def export_csv(self):
+        try:
+            subprocess.run(
+                ["python", "app/export_report_csv.py"],
+                check=True
+            )
+            messagebox.showinfo(
+                "Eksport zakończony",
+                "Raport CSV został wygenerowany poprawnie."
+            )
+        except Exception as e:
+            messagebox.showerror(
+                "Błąd eksportu",
+                f"Nie udało się wygenerować raportu CSV:\n{e}"
+            )
+
+
+if __name__ == "__main__":
+    app = GUIAdmin()
+    app.mainloop()
