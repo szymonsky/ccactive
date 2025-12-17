@@ -1,3 +1,4 @@
+# raport, ale w wersji CLI - podobna logika jak dla buttona raportu csv
 # łączy się z bazą i wyświetla raport czasu pracy agentów w podziale na dni i statusy
 import os
 import sys

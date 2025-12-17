@@ -38,3 +38,6 @@ with connection.cursor() as cursor:
 print(f"raport zapisany do pliku {filename}")
 
 connection.close()
+
+#Dodatkowo w katalogu dev_tools znajduje się wersja raportu w trybie tekstowym (CLI),
+#wykorzystywana na etapie testów i walidacji danych.
