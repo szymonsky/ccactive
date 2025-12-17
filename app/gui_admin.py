@@ -1,5 +1,11 @@
 # gui administracyjne (read-only)
-# podgląd aktualnych statusów agentów + prosty dashboard + eksport csv
+# panel monitorujący pracę call center
+#
+# funkcjonalności:
+# - podgląd aktualnych statusów agentów
+# - dashboard liczbowy (liczba agentów w statusach)
+# - dashboard czasowy (czas pracy agentów w statusach – bieżący dzień)
+# - eksport raportu historycznego do pliku csv
 
 import tkinter as tk
 from tkinter import ttk, messagebox
@@ -7,36 +13,63 @@ import os
 import sys
 import subprocess
 
-# dodaj ścieżkę do katalogu głównego projektu
+# dodanie ścieżki do katalogu głównego projektu
+# umożliwia poprawne importy modułów aplikacji
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from app.db_connection import get_connection
 
 
 class GUIAdmin(tk.Tk):
+    """
+    główne okno panelu administracyjnego ccactive
+
+    gui ma charakter wyłącznie odczytowy (read-only)
+    wszystkie dane pobierane są bezpośrednio z bazy danych
+    """
+
     def __init__(self):
         super().__init__()
+
+        # konfiguracja podstawowych parametrów okna
         self.title("CCActive – panel administracyjny")
-        self.geometry("800x450")
+        self.geometry("950x650")
         self.resizable(False, False)
 
+        # inicjalizacja komponentów gui
         self.create_widgets()
-        self.load_data()
-        self.load_dashboard()
+
+        # wczytanie danych początkowych
+        self.refresh_all()
+
+    # ==========================================================
+    # SEKCJA: BUDOWA INTERFEJSU UŻYTKOWNIKA
+    # ==========================================================
 
     def create_widgets(self):
-        # --- tytuł tabeli ---
+        """
+        tworzy wszystkie elementy interfejsu użytkownika
+        (tabele, dashboardy, przyciski)
+        """
+
+        # --- sekcja 1: aktualne statusy agentów ---
         ttk.Label(
             self,
             text="Aktualne statusy agentów",
             font=("Segoe UI", 11, "bold")
         ).pack(pady=(10, 5))
 
-        # --- tabela statusów ---
+        # tabela prezentująca bieżący status każdego agenta
         columns = ("username", "role", "status", "since")
 
-        self.tree = ttk.Treeview(self, columns=columns, show="headings", height=8)
-        self.tree.heading("username", text="Użytkownik")
+        self.tree = ttk.Treeview(
+            self,
+            columns=columns,
+            show="headings",
+            height=7
+        )
+
+        self.tree.heading("username", text="Agent")
         self.tree.heading("role", text="Rola")
         self.tree.heading("status", text="Status")
         self.tree.heading("since", text="Od")
@@ -48,21 +81,47 @@ class GUIAdmin(tk.Tk):
 
         self.tree.pack(fill=tk.X, padx=10)
 
-        # --- dashboard ---
+        # --- sekcja 2: dashboard liczbowy ---
         ttk.Label(
             self,
-            text="Statusy bieżące (liczba agentów)",
+            text="Statusy bieżące – liczba agentów",
             font=("Segoe UI", 10, "bold")
         ).pack(pady=(15, 5))
 
-        self.dashboard_frame = ttk.Frame(self)
-        self.dashboard_frame.pack(pady=5)
+        # kontener na dynamicznie generowane etykiety statusów
+        self.dashboard_count_frame = ttk.Frame(self)
+        self.dashboard_count_frame.pack(pady=5)
 
-        self.dashboard_labels = {}
+        # --- sekcja 3: dashboard czasowy ---
+        ttk.Label(
+            self,
+            text="Czas pracy agentów w statusach – bieżący dzień (minuty)",
+            font=("Segoe UI", 10, "bold")
+        ).pack(pady=(20, 5))
 
-        # --- przyciski ---
+        # tabela prezentująca czas pracy agentów w statusach
+        time_columns = ("username", "status", "minutes")
+
+        self.time_tree = ttk.Treeview(
+            self,
+            columns=time_columns,
+            show="headings",
+            height=8
+        )
+
+        self.time_tree.heading("username", text="Agent")
+        self.time_tree.heading("status", text="Status")
+        self.time_tree.heading("minutes", text="Minuty (dzisiaj)")
+
+        self.time_tree.column("username", width=160)
+        self.time_tree.column("status", width=160)
+        self.time_tree.column("minutes", width=140, anchor="center")
+
+        self.time_tree.pack(fill=tk.X, padx=10)
+
+        # --- sekcja 4: przyciski sterujące ---
         buttons_frame = ttk.Frame(self)
-        buttons_frame.pack(pady=15)
+        buttons_frame.pack(pady=20)
 
         ttk.Button(
             buttons_frame,
@@ -76,8 +135,17 @@ class GUIAdmin(tk.Tk):
             command=self.export_csv
         ).grid(row=0, column=1, padx=10)
 
-    def load_data(self):
-        # wyczyść tabelę
+    # ==========================================================
+    # SEKCJA: WCZYTYWANIE DANYCH Z BAZY
+    # ==========================================================
+
+    def load_current_statuses(self):
+        """
+        wczytuje aktualne statusy agentów
+        dane pobierane są z widoku view_current_status
+        """
+
+        # wyczyszczenie tabeli
         for row in self.tree.get_children():
             self.tree.delete(row)
 
@@ -94,19 +162,20 @@ class GUIAdmin(tk.Tk):
             ORDER BY username
         """)
 
-        rows = cursor.fetchall()
-
-        for row in rows:
+        for row in cursor.fetchall():
             self.tree.insert("", tk.END, values=row)
 
         cursor.close()
         connection.close()
 
-    def load_dashboard(self):
-        # dashboard admina: zliczenie liczby agentów w poszczególnych statusach (stan bieżący)
+    def load_dashboard_status_count(self):
+        """
+        dashboard liczbowy:
+        liczba agentów w poszczególnych statusach (stan bieżący)
+        """
 
-        # usuń stare etykiety
-        for widget in self.dashboard_frame.winfo_children():
+        # usunięcie poprzednich etykiet
+        for widget in self.dashboard_count_frame.winfo_children():
             widget.destroy()
 
         connection = get_connection()
@@ -121,26 +190,65 @@ class GUIAdmin(tk.Tk):
             ORDER BY status_name
         """)
 
-        rows = cursor.fetchall()
-
         col = 0
-        for status_name, count in rows:
-            label = ttk.Label(
-                self.dashboard_frame,
+        for status_name, count in cursor.fetchall():
+            ttk.Label(
+                self.dashboard_count_frame,
                 text=f"{status_name}: {count}",
                 font=("Segoe UI", 10)
-            )
-            label.grid(row=0, column=col, padx=15)
+            ).grid(row=0, column=col, padx=15)
             col += 1
 
         cursor.close()
         connection.close()
 
+    def load_dashboard_time_today(self):
+        """
+        dashboard czasowy:
+        dzienny czas pracy agentów w statusach
+        dane pobierane są z widoku view_today_agent_status_time
+        """
+
+        # wyczyszczenie tabeli dashboardu czasowego
+        for row in self.time_tree.get_children():
+            self.time_tree.delete(row)
+
+        connection = get_connection()
+        cursor = connection.cursor()
+
+        cursor.execute("""
+            SELECT
+                username,
+                status_name,
+                minutes_today
+            FROM view_today_agent_status_time
+            ORDER BY username, status_name
+        """)
+
+        for row in cursor.fetchall():
+            self.time_tree.insert("", tk.END, values=row)
+
+        cursor.close()
+        connection.close()
+
+    # ==========================================================
+    # SEKCJA: OPERACJE UŻYTKOWNIKA
+    # ==========================================================
+
     def refresh_all(self):
-        self.load_data()
-        self.load_dashboard()
+        """
+        odświeża wszystkie sekcje panelu administracyjnego
+        """
+
+        self.load_current_statuses()
+        self.load_dashboard_status_count()
+        self.load_dashboard_time_today()
 
     def export_csv(self):
+        """
+        uruchamia moduł eksportu raportu historycznego do pliku csv
+        """
+
         try:
             subprocess.run(
                 [sys.executable, "app/export_report_csv.py"],

@@ -7,7 +7,7 @@ select * from work_sessions order by 1 desc;
 SELECT * FROM status_logs ORDER BY timestamp_start desc;
 SELECT * FROM status_logs ORDER BY timestamp_start DESC;
 SELECT * FROM status_logs where source = 'voip' ORDER BY timestamp_start DESC;
-
+select * from view_today_agent_status_time order by 1,2;
 
 SELECT 
     log_id,
