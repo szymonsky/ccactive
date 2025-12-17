@@ -1,72 +1,74 @@
-# to graficzny interfejs do zmiany statusu użytkownika w aplikacji CCActive
+# gui administracyjne (read-only)
+# podgląd aktualnych statusów agentów
 
 import tkinter as tk
-print("==== STARTUJĘ GUI CCActive ====")
-from tkinter import ttk, messagebox
+from tkinter import ttk
 import os
 import sys
 
-# dodaj ścieżkę do katalogu głównego, by importy z app działały
+# dodaj ścieżkę do katalogu głównego projektu
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-from app.utils import get_users, get_statuses
 from app.db_connection import get_connection
 
-class CCActiveGUI(tk.Tk):
+
+class GUIAdmin(tk.Tk):
     def __init__(self):
         super().__init__()
-        self.title("CCActive – zmiana statusu agenta")
-        self.geometry("400x300")
+        self.title("CCActive – panel administracyjny")
+        self.geometry("600x300")
         self.resizable(False, False)
 
-        self.create_widgets()  #  to wywołuje wszystkie elementy GUI
+        self.create_widgets()
+        self.load_data()
 
     def create_widgets(self):
-        ttk.Label(self, text="Wybierz użytkownika:").pack(pady=5)
-        self.user_combo = ttk.Combobox(self, state="readonly")
-        self.user_combo['values'] = [f"{user[0]}: {user[1]}" for user in get_users()]
-        self.user_combo.pack()
+        # tabela statusów
+        columns = ("username", "role", "status", "since")
 
-        ttk.Label(self, text="Wybierz nowy status:").pack(pady=5)
-        self.status_combo = ttk.Combobox(self, state="readonly")
-        self.status_combo['values'] = [f"{status[0]}: {status[1]}" for status in get_statuses()]
-        self.status_combo.pack()
+        self.tree = ttk.Treeview(self, columns=columns, show="headings")
+        self.tree.heading("username", text="Użytkownik")
+        self.tree.heading("role", text="Rola")
+        self.tree.heading("status", text="Status")
+        self.tree.heading("since", text="Od")
 
-        ttk.Button(self, text="Zmień status", command=self.change_status).pack(pady=20)
+        self.tree.column("username", width=150)
+        self.tree.column("role", width=100)
+        self.tree.column("status", width=150)
+        self.tree.column("since", width=180)
 
-    def change_status(self):
-        user = self.user_combo.get()
-        status = self.status_combo.get()
+        self.tree.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
 
-        if not user or not status:
-            messagebox.showwarning("Błąd", "Wybierz użytkownika i status.")
-            return
+        # przycisk odświeżania
+        ttk.Button(self, text="Odśwież", command=self.load_data).pack(pady=5)
 
-        user_id = int(user.split(":")[0])
-        status_id = int(status.split(":")[0])
+    def load_data(self):
+        # wyczyść tabelę
+        for row in self.tree.get_children():
+            self.tree.delete(row)
 
         connection = get_connection()
         cursor = connection.cursor()
 
-        # zakończ poprzedni status (jeśli jest otwarty)
         cursor.execute("""
-            UPDATE status_logs
-            SET timestamp_end = SYSTIMESTAMP
-            WHERE user_id = :uid AND timestamp_end IS NULL
-        """, [user_id])
+            SELECT
+                username,
+                role_name,
+                status_name,
+                timestamp_start
+            FROM view_current_status
+            ORDER BY username
+        """)
 
-        # dodaj nowy status
-        cursor.execute("""
-            INSERT INTO status_logs (user_id, status_id, timestamp_start)
-            VALUES (:uid, :sid, SYSTIMESTAMP)
-        """, [user_id, status_id])
+        rows = cursor.fetchall()
 
-        connection.commit()
+        for row in rows:
+            self.tree.insert("", tk.END, values=row)
+
         cursor.close()
         connection.close()
 
-        messagebox.showinfo("Sukces", "Status został zmieniony.")
 
 if __name__ == "__main__":
-    app = CCActiveGUI()
+    app = GUIAdmin()
     app.mainloop()

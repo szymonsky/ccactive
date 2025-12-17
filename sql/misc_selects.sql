@@ -5,6 +5,9 @@ select * from roles order by 1 desc;
 select * from VIEW_CURRENT_STATUS order by 1 desc;
 select * from work_sessions order by 1 desc;
 SELECT * FROM status_logs ORDER BY user_id, timestamp_start;
+SELECT * FROM status_logs ORDER BY timestamp_start DESC;
+SELECT * FROM status_logs where source = 'voip' ORDER BY timestamp_start DESC;
+
 
 SELECT 
     log_id,
