@@ -1,4 +1,5 @@
-# raport, ale w wersji CLI - podobna logika jak dla buttona raportu csv
+# dev-only: raport zbiorczy w trybie cli
+# wykorzystywany do testów i walidacji danych
 # łączy się z bazą i wyświetla raport czasu pracy agentów w podziale na dni i statusy
 import os
 import sys
