@@ -143,7 +143,7 @@ class GUIAdmin(tk.Tk):
     def export_csv(self):
         try:
             subprocess.run(
-                ["python", "app/export_report_csv.py"],
+                [sys.executable, "app/export_report_csv.py"],
                 check=True
             )
             messagebox.showinfo(
