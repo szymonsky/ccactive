@@ -20,11 +20,12 @@ SELECT
 FROM status_logs
 ORDER BY user_id, timestamp_start;;
 
+SELECT COUNT(*) as StatusLogsCount FROM status_logs;
+SELECT COUNT(*) as WorkSessionsCount FROM work_sessions;
+
 /*
 --czyszczenie
 DELETE FROM status_logs;
 DELETE FROM work_sessions;
 COMMIT;
 */
-SELECT COUNT(*) as StatusLogsCount FROM status_logs;
-SELECT COUNT(*) as WorkSessionsCount FROM work_sessions;

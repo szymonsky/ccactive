@@ -1,7 +1,8 @@
--- Dodaje przykładowych użytkowników do tabeli USERS z hasłami w SHA-256
+-- tylko do testowania
+-- dodaje przykładowych użytkowników do tabeli USERS z hasłami w SHA-256
 -- wykonywac z usera ccactive_user
 -- UWAGA: dane testowe z jawnymi hasłami (w formie hashów SHA-256)
--- tylko do testowania
+
 
 -- Użytkownik 1: Agent Jan (hasło: password)
 INSERT INTO users (username, password_hash, role_id)

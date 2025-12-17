@@ -1,6 +1,5 @@
--- wykonywać z usera: ccactive_user
 -- Testowe dane: historia zmian statusów agentów
-
+-- wykonywać z usera: ccactive_user
 
 -- Agent Jan: 2 statusy
 INSERT INTO status_logs (user_id, status_id, timestamp_start, timestamp_end)
