@@ -156,6 +156,7 @@ class GUIAdmin(tk.Tk):
                 f"Nie udało się wygenerować raportu CSV:\n{e}"
             )
 
+
 if __name__ == "__main__":
     app = GUIAdmin()
     app.mainloop()
