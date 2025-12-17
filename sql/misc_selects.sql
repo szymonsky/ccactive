@@ -4,7 +4,7 @@ select * from users order by 1 desc;
 select * from roles order by 1 desc;
 select * from VIEW_CURRENT_STATUS order by 1 desc;
 select * from work_sessions order by 1 desc;
-SELECT * FROM status_logs ORDER BY user_id, timestamp_start;
+SELECT * FROM status_logs ORDER BY timestamp_start desc;
 SELECT * FROM status_logs ORDER BY timestamp_start DESC;
 SELECT * FROM status_logs where source = 'voip' ORDER BY timestamp_start DESC;
 
@@ -19,3 +19,12 @@ SELECT
     external_call_id
 FROM status_logs
 ORDER BY user_id, timestamp_start;;
+
+/*
+--czyszczenie
+DELETE FROM status_logs;
+DELETE FROM work_sessions;
+COMMIT;
+*/
+SELECT COUNT(*) as StatusLogsCount FROM status_logs;
+SELECT COUNT(*) as WorkSessionsCount FROM work_sessions;
